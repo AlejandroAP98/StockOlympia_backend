@@ -40,7 +40,6 @@ app.use('/api/roles', rolRouter)
 
 
 
-app.listen(PORT, () => {
-    console.log(`Servidor corriendo en http://192.168.1.2:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
-
