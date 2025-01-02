@@ -15,6 +15,7 @@ const MovimientoModel = {
       FROM movimientos
       JOIN productos ON movimientos.id_producto = productos.id
       ORDER BY movimientos.fecha_movimiento DESC
+      LIMIT 1001
     `);
     
     
