@@ -12,7 +12,7 @@ const rolRouter = require('./routes/rolRoutes');
 const cors = require('cors');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 10000;
 
 app.use(cors({
     origin: 'http://192.168.1.2',
@@ -38,4 +38,6 @@ app.use('/api/movimientos', movimientoRoutes);
 app.use('/api/salas_productos', salaProductoRoutes);
 app.use('/api/roles', rolRouter)
 
-app.listen(PORT, '0.0.0.0');
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en ${PORT}`);
+});
