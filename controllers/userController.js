@@ -73,11 +73,11 @@ const userController = {
       const user = await UserModel.findByUsername(usuario) || await UserModel.findByEmail(usuario);
       if (user && (await bcrypt.compare(contrasena, user.contrasena))) {
         const token = jwt.sign(
-          { id: user.id, usuario: user.usuario, rol: user.id_rol, sala: user.id_sala },
+          { usuario: user.usuario, rol: user.id_rol, sala: user.id_sala, user_id: user.id },
           process.env.JWT_SECRET,
           { expiresIn: '1h' }
-        );
-        return res.json({ token, sala: user.id_sala, rol: user.id_rol });
+        );  
+        return res.json({ token, sala: user.id_sala, rol: user.id_rol, user_id: user.id });
       }
       res.status(401).send('Credenciales incorrectas');
     } catch (error) {
@@ -85,6 +85,40 @@ const userController = {
       res.status(500).send('Error en el servidor');
     }
   },
+
+  changePassword: async (req, res) => {
+    const { id, contrasena, nueva_contrasena } = req.body;
+  
+    if (!id || !contrasena || !nueva_contrasena) {
+      return res.status(400).send('Faltan datos requeridos');
+    }
+  
+    try {
+      // Verificar que el usuario existe y obtener sus datos
+      const user = await UserModel.findById(id);
+      if (!user) {
+        return res.status(404).send('Usuario no encontrado');
+      }
+  
+      // Verificar la contraseña actual
+      const isMatch = await bcrypt.compare(contrasena, user.contrasena);
+      if (!isMatch) {
+        return res.status(401).send('Contraseña incorrecta');
+      }
+  
+      // Actualizar el usuario con la nueva contraseña
+      const updatedUser = await UserModel.update(id, {
+        ...user, // Mantener los datos del usuario  
+        contrasena: nueva_contrasena, // Reemplazar la contraseña
+      });
+  
+      res.json({ message: 'Contraseña actualizada exitosamente', user: updatedUser });
+    } catch (error) {
+      console.error('Error al actualizar usuario:', error);
+      res.status(500).send('Error en el servidor');
+    }
+  },
+  
 };
 
 module.exports = userController;

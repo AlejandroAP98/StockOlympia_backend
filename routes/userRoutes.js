@@ -23,4 +23,7 @@ router.delete('/:id', authenticateJWT, authorizeRole(1), userController.deleteUs
 // Ruta de login
 router.post('/login', userController.login);
 
+// cambio de contraseña
+router.put('/:id/password', authenticateJWT, userController.changePassword);
+
 module.exports = router;
