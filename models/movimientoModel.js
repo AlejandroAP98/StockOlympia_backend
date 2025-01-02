@@ -252,11 +252,13 @@ const MovimientoModel = {
     
   },
   
-  getHistoryProduct: async (startDate, endDate, id_sala, id_producto) => {
+  getHistoryProduct: async (startDate, endDate, id_sala, id_producto, id_categoria, id_marca) => {
     const params = [];
     let query = `
       SELECT
         productos.nombre AS nombre_producto,
+        categorias.nombre AS nombre_categoria_producto,
+        marcas.nombre AS nombre_marca,
         movimientos.tipo_movimiento,
         movimientos.cantidad,
         movimientos.fecha_movimiento,
@@ -264,6 +266,8 @@ const MovimientoModel = {
       FROM movimientos
       JOIN productos ON movimientos.id_producto = productos.id
       JOIN salas ON movimientos.id_sala = salas.id
+      JOIN categorias ON productos.id_categoria = categorias.id
+      JOIN marcas ON productos.id_marca = marcas.id
       WHERE 1=1
     `;
   
@@ -278,7 +282,19 @@ const MovimientoModel = {
       query += ` AND movimientos.id_sala = $${params.length + 1}`;
       params.push(id_sala);
     }
-  
+
+    //si se pasa un id_categoria, lo agregamos a la consulta
+    if (id_categoria) {
+      query += ` AND productos.id_categoria = $${params.length + 1}`;
+      params.push(id_categoria);
+    }
+
+    //si se pasa un id_marca, lo agregamos a la consulta
+    if (id_marca) {
+      query += ` AND productos.id_marca = $${params.length + 1}`;
+      params.push(id_marca);
+    }
+    
     // Solo agregamos las fechas si están presentes
     let hasDateCondition = false;
   
@@ -316,11 +332,13 @@ const MovimientoModel = {
     return result.rows;
   },
 
-  getCostInputs: async (startDate, endDate, id_sala, id_producto) => {
+  getCostInputs: async (startDate, endDate, id_sala, id_producto, id_categoria, id_marca) => {
     const params = [];
     let query = `
       SELECT
         productos.nombre AS nombre_producto,
+        categorias.nombre AS nombre_categoria_producto,
+        marcas.nombre AS nombre_marca,
         movimientos.tipo_movimiento,
         movimientos.cantidad,
         productos.precio,
@@ -330,6 +348,8 @@ const MovimientoModel = {
       FROM movimientos
       JOIN productos ON movimientos.id_producto = productos.id
       JOIN salas ON movimientos.id_sala = salas.id
+      JOIN categorias ON productos.id_categoria = categorias.id
+      JOIN marcas ON productos.id_marca = marcas.id
       WHERE movimientos.tipo_movimiento = 'entrada' 
     `;
   
@@ -344,7 +364,19 @@ const MovimientoModel = {
       query += ` AND movimientos.id_sala = $${params.length + 1}`;
       params.push(id_sala);
     }
-  
+
+    //si se pasa un id_categoria, lo agregamos a la consulta
+    if (id_categoria) {
+      query += ` AND productos.id_categoria = $${params.length + 1}`;
+      params.push(id_categoria);
+    }
+
+    //si se pasa un id_marca, lo agregamos a la consulta
+    if (id_marca) {
+      query += ` AND productos.id_marca = $${params.length + 1}`;
+      params.push(id_marca);
+    }
+
     // Solo agregamos las fechas si están presentes
     let hasDateCondition = false;
   
@@ -381,8 +413,56 @@ const MovimientoModel = {
     });
     return result.rows;
   },
-  
 
+  getChartEntradasSalas: async (startDate, endDate, id_sala) => {
+    const params = [];
+    let query = `
+      SELECT
+      (movimientos.cantidad * productos.precio) AS valor,
+      movimientos.fecha_movimiento AS fecha,
+      salas.nombre AS sala
+      FROM movimientos
+      JOIN productos ON movimientos.id_producto = productos.id
+      JOIN salas ON movimientos.id_sala = salas.id
+      WHERE movimientos.tipo_movimiento = 'entrada'
+    `;
+    if (id_sala) {
+      query += ` AND movimientos.id_sala = ${id_sala}`;
+    }
+
+    // Solo agregamos las fechas si están presentes
+    let hasDateCondition = false;
+  
+    if (startDate) {
+      const startDateLocal = new Date(startDate).toLocaleString("en-US", { timeZone: "America/Bogota" });
+      const startDateWithTime = new Date(startDateLocal);
+      startDateWithTime.setHours(23, 59, 59, 999);
+      const startDateUTC = startDateWithTime.toISOString();
+      params.push(startDateUTC);
+      query += ` AND movimientos.fecha_movimiento >= $${params.length}`;
+      hasDateCondition = true;
+    }
+  
+    if (endDate) {
+      // Si ya hemos agregado una condición de fecha, agregamos AND
+      if (hasDateCondition) query += ` AND `;
+      
+      const endDateLocal = new Date(endDate).toLocaleString("en-US", { timeZone: "America/Bogota" });
+      const endDateWithTime = new Date(endDateLocal);
+      endDateWithTime.setHours(47, 59, 59, 999);
+      const endDateUTC = endDateWithTime.toISOString();
+      params.push(endDateUTC);
+      query += ` movimientos.fecha_movimiento <= $${params.length}`;
+    }
+    query += `
+      ORDER BY movimientos.fecha_movimiento ASC
+    `;
+    const result = await pool.query(query, params);
+    result.rows.forEach(row => {
+      row.fecha = new Date(row.fecha).toLocaleDateString('es-CO', { timeZone: 'America/Bogota' });
+    });
+    return result.rows;
+  },
 };
 
 module.exports = MovimientoModel;

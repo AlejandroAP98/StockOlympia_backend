@@ -38,8 +38,4 @@ app.use('/api/movimientos', movimientoRoutes);
 app.use('/api/salas_productos', salaProductoRoutes);
 app.use('/api/roles', rolRouter)
 
-
-
-app.listen(PORT, '192.168.1.2', () => {
-    console.log(`Servidor corriendo en http://0.0.0.0:${PORT}`);
-});
+app.listen(PORT, '192.168.1.2');

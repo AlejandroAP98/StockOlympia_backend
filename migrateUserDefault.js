@@ -43,12 +43,7 @@ async function createAdminUser() {
         adminUser.id_rol,
         adminUser.id_sala,
       ]);
-
-      console.log('Usuario administrador creado con éxito.');
-    } else {
-      console.log('Ya existen usuarios en el sistema, no es necesario crear uno nuevo.');
-    }
-
+    } 
     await client.query('COMMIT');
   } catch (error) {
     await client.query('ROLLBACK');
@@ -60,5 +55,4 @@ async function createAdminUser() {
 
 // Ejecutar la función
 createAdminUser()
-  .then(() => console.log('Proceso finalizado.'))
   .catch((error) => console.error('Error en el proceso:', error));

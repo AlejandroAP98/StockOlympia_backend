@@ -12,6 +12,7 @@ router.get('/reporte/movimiento-producto', movimientoController.getMovedProducts
 router.get('/reporte/productos-sin-salidas', movimientoController.getWithOutOutputProducts);
 router.get('/reporte/historial-producto',movimientoController.getHistoryProduct);
 router.get('/reporte/valor-entradas',movimientoController.getCostInputs);
+router.get('/reporte/grafico-entradas-salas',movimientoController.getChartEntradasSalas);
 
 
 module.exports = router;
