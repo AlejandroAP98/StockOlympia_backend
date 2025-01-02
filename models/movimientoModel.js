@@ -322,6 +322,7 @@ const MovimientoModel = {
   
     query += `
       ORDER BY movimientos.fecha_movimiento DESC
+      LIMIT 1000
     `;
   
     const result = await pool.query(query, params);
