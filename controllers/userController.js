@@ -2,7 +2,8 @@
 const UserModel = require('../models/userModel');
 const jwt = require('jsonwebtoken'); // Para generar tokens
 require('dotenv').config();
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+
 
 const userController = {
   getAllUsers: async (req, res) => {

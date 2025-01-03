@@ -1,6 +1,6 @@
 // src/models/userModel.js
 const { pool } = require('../db'); // Asegúrate de importar tu conexión a la base de datos
-const bcrypt = require('bcrypt'); // Para hashear contraseñas
+const bcrypt = require('bcryptjs'); // Para hashear contraseñas
 
 const UserModel = {
   findAll: async () => {
