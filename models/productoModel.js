@@ -9,17 +9,14 @@ const ProductoModel = {
 
   create: async (producto) => {
     const { nombre, cantidad, id_categoria, id_marca, precio } = producto;
-  
-    // Verificar si ya existe un producto con el mismo nombre y marca
     const existingProduct = await pool.query(
-      'SELECT * FROM productos WHERE LOWER(nombre) = LOWER($1) AND id_marca = $2'
+      'SELECT * FROM productos WHERE LOWER(nombre) = LOWER($1) AND id_marca = $2',
       [nombre, id_marca]
     );
   
     if (existingProduct.rows.length > 0) {
       throw new Error('Ya existe un producto con el mismo nombre y marca');
     }
-  
     // Insertar el nuevo producto
     const result = await pool.query(
       'INSERT INTO productos (nombre, cantidad, id_categoria, id_marca, precio) VALUES ($1, $2, $3, $4, $5) RETURNING *',
