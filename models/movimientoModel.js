@@ -10,7 +10,7 @@ const MovimientoModel = {
         movimientos.id_sala,
         movimientos.cantidad,
         movimientos.tipo_movimiento,
-        movimientos.fecha_movimiento,
+        movimientos.fecha_movimiento AT TIME ZONE 'America/Bogota' AS fecha_movimiento,
         productos.nombre AS nombre_producto
       FROM movimientos
       JOIN productos ON movimientos.id_producto = productos.id
@@ -19,10 +19,10 @@ const MovimientoModel = {
     `);
     
     
-    result.rows.forEach(row => {
+    // result.rows.forEach(row => {
      
-      row.fecha_movimiento = new Date(row.fecha_movimiento).toLocaleString('es-CO', { timeZone: 'America/Bogota' });
-    });
+    //   row.fecha_movimiento = new Date(row.fecha_movimiento).toLocaleString('es-CO', { timeZone: 'America/Bogota' });
+    // });
 
   return result.rows;
   },
