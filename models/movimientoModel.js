@@ -19,10 +19,10 @@ const MovimientoModel = {
     `);
     
     
-    // result.rows.forEach(row => {
+    result.rows.forEach(row => {
      
-    //   row.fecha_movimiento = new Date(row.fecha_movimiento).toLocaleString('es-CO', { timeZone: 'America/Bogota' });
-    // });
+      row.fecha_movimiento = new Date(row.fecha_movimiento).toLocaleString('es-CO', { timeZone: 'America/Bogota' });
+    });
 
   return result.rows;
   },
