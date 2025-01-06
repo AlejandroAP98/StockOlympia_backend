@@ -102,11 +102,23 @@ const movimientoController = {
 
   getChartEntradasSalas: async (req, res) => {
     try {
-      const { startDate, endDate, id_sala } = req.query;
-      const reporte = await MovimientoModel.getChartEntradasSalas(startDate, endDate, id_sala);
+      const { startDate, endDate, id_sala, id_producto } = req.query;
+      const reporte = await MovimientoModel.getChartEntradasSalas(startDate, endDate, id_sala, id_producto);
       res.status(200).json(reporte);
     } catch (error) {
       console.error('Error obteniendo el reporte de movimiento de producto:', error);
+      res.status(500).json({ error: 'Error al obtener el reporte' });
+    }
+  },
+
+  
+  getChartSalidasSalas: async (req, res) => {
+    try {
+      const { startDate, endDate, id_sala, id_producto } = req.query;
+      const reporte = await MovimientoModel.getChartSalidasSalas(startDate, endDate, id_sala, id_producto);
+      res.status(200).json(reporte);
+    } catch (error) {
+      console.error('Error obteniendo el reporte de movimiento de salidas:', error);
       res.status(500).json({ error: 'Error al obtener el reporte' });
     }
   },

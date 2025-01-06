@@ -415,7 +415,7 @@ const MovimientoModel = {
     return result.rows;
   },
 
-  getChartEntradasSalas: async (startDate, endDate, id_sala) => {
+  getChartEntradasSalas: async (startDate, endDate, id_sala, id_producto) => {
     const params = [];
     let query = `
       SELECT
@@ -429,6 +429,9 @@ const MovimientoModel = {
     `;
     if (id_sala) {
       query += ` AND movimientos.id_sala = ${id_sala}`;
+    }
+    if (id_producto) {
+      query += ` AND movimientos.id_producto = ${id_producto}`;
     }
 
     // Solo agregamos las fechas si están presentes
@@ -464,6 +467,59 @@ const MovimientoModel = {
     });
     return result.rows;
   },
+
+  getChartSalidasSalas : async (startDate, endDate, id_sala, id_producto) => {
+    const params = [];
+    let query = `
+      SELECT
+      (movimientos.cantidad * productos.precio) AS valor,
+      movimientos.fecha_movimiento AS fecha,
+      salas.nombre AS sala
+      FROM movimientos
+      JOIN productos ON movimientos.id_producto = productos.id
+      JOIN salas ON movimientos.id_sala = salas.id
+      WHERE movimientos.tipo_movimiento = 'salida'
+    `;
+    if (id_sala) {
+      query += ` AND movimientos.id_sala = ${id_sala}`;
+    }
+    if (id_producto) {
+      query += ` AND movimientos.id_producto = ${id_producto}`;
+    }
+    // Solo agregamos las fechas si están presentes
+    let hasDateCondition = false;
+  
+    if (startDate) {
+      const startDateLocal = new Date(startDate).toLocaleString("en-US", { timeZone: "America/Bogota" });
+      const startDateWithTime = new Date(startDateLocal);
+      startDateWithTime.setHours(23, 59, 59, 999);
+      const startDateUTC = startDateWithTime.toISOString();
+      params.push(startDateUTC);
+      query += ` AND movimientos.fecha_movimiento >= $${params.length}`;
+      hasDateCondition = true;
+    }
+  
+    if (endDate) {
+      // Si ya hemos agregado una condición de fecha, agregamos AND
+      if (hasDateCondition) query += ` AND `;
+      
+      const endDateLocal = new Date(endDate).toLocaleString("en-US", { timeZone: "America/Bogota" });
+      const endDateWithTime = new Date(endDateLocal);
+      endDateWithTime.setHours(47, 59, 59, 999);
+      const endDateUTC = endDateWithTime.toISOString();
+      params.push(endDateUTC);
+      query += ` movimientos.fecha_movimiento <= $${params.length}`;
+    }
+    query += `
+      ORDER BY movimientos.fecha_movimiento ASC
+    `;
+    const result = await pool.query(query, params);
+    result.rows.forEach(row => {
+      row.fecha = new Date(row.fecha).toLocaleDateString('es-CO', { timeZone: 'America/Bogota' });
+    });
+    return result.rows;
+  },
+
 };
 
 module.exports = MovimientoModel;
