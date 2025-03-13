@@ -1,5 +1,6 @@
 // src/controllers/categoriaController.js
 const CategoriaModel = require('../models/categoriaModel');
+const { pool } = require('../db');
 
 const categoriaController = {
   getAllCategorias: async (req, res) => {
@@ -51,6 +52,30 @@ const categoriaController = {
       res.status(204).send();
     } catch (error) {
       console.error('Error al eliminar categoría:', error);
+      res.status(500).send('Error en el servidor');
+    }
+  },
+
+  searchCategoria: async (req, res) => {
+    const { term } = req.query;
+    try {
+      const query = `
+        SELECT 
+          c.id,
+          c.nombre,
+          c.descripcion
+        FROM 
+          categorias c
+        WHERE 
+          c.nombre ILIKE $1
+        GROUP BY 
+          c.id;
+      `;
+      const values = [`%${term}%`];
+      const { rows: categorias } = await pool.query(query, values);
+      res.json(categorias);
+    } catch (error) {
+      console.error('Error al buscar categoría:', error);
       res.status(500).send('Error en el servidor');
     }
   },

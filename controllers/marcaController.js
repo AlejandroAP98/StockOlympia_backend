@@ -1,5 +1,7 @@
 // src/controllers/marcaController.js
 const MarcaModel = require('../models/marcaModel');
+const { pool } = require('../db');
+
 
 const marcaController = {
   getAllMarcas: async (req, res) => {
@@ -51,6 +53,30 @@ const marcaController = {
       res.status(204).send();
     } catch (error) {
       console.error('Error al eliminar marca:', error);
+      res.status(500).send('Error en el servidor');
+    }
+  },
+
+  searchMarca: async (req, res) => {
+    const { term } = req.query;
+    try {
+      const query = `
+        SELECT 
+          m.id, 
+          m.nombre, 
+          m.descripcion
+        FROM 
+          marcas m
+        WHERE 
+          m.nombre ILIKE $1
+        GROUP BY 
+          m.id;
+      `;
+      const values = [`%${term}%`];
+      const { rows: marcas } = await pool.query(query, values);
+      res.json(marcas);
+    } catch (error) {
+      console.error('Error al buscar marca:', error);
       res.status(500).send('Error en el servidor');
     }
   },
