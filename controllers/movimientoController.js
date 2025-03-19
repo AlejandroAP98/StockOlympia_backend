@@ -15,7 +15,8 @@ const movimientoController = {
 
   createMovimiento: async (req, res) => {
     try {
-      const newMovimiento = await MovimientoModel.create(req.body);
+      const id_usuario = req.user.user_id;
+      const newMovimiento = await MovimientoModel.create(req.body, id_usuario);
       res.status(201).json(newMovimiento);
     } catch (error) {
       console.error('Error al crear movimiento:', error);
@@ -135,7 +136,8 @@ const movimientoController = {
   getHistoryProduct: async (req, res)=>{
     try {
       const { startDate, endDate, id_sala, id_producto , id_categoria, id_marca } = req.query;
-      const reporte = await MovimientoModel.getHistoryProduct(startDate, endDate, id_sala, id_producto, id_categoria, id_marca);
+      const id_usuario = req.user.user_id;
+      const reporte = await MovimientoModel.getHistoryProduct(startDate, endDate, id_sala, id_producto, id_categoria, id_marca, id_usuario);
       res.status(200).json(reporte);
     } catch (error) {
       console.error('Error obteniendo el reporte de movimiento de producto:', error);
@@ -146,7 +148,8 @@ const movimientoController = {
   getCostInputs: async (req, res)=>{
     try {
       const { startDate, endDate, id_sala, id_producto, id_categoria, id_marca } = req.query;
-      const reporte = await MovimientoModel.getCostInputs(startDate, endDate, id_sala, id_producto , id_categoria, id_marca);
+      const id_usuario = req.user.user_id;
+      const reporte = await MovimientoModel.getCostInputs(startDate, endDate, id_sala, id_producto , id_categoria, id_marca, id_usuario);
       res.status(200).json(reporte);
     } catch (error) {
       console.error('Error obteniendo el reporte de movimiento de producto:', error);
