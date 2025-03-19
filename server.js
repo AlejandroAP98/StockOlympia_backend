@@ -8,6 +8,7 @@ const salaRoutes = require('./routes/salaRoutes');
 const movimientoRoutes = require('./routes/movimientoRoute');
 const salaProductoRoutes=require('./routes/salaProductoRoute');
 const rolRouter = require('./routes/rolRoutes');
+const codigoRoutes = require("./routes/codigoRoutes");
 
 const cors = require('cors');
 
@@ -36,6 +37,7 @@ app.use('/api/salas', salaRoutes);
 app.use('/api/movimientos', movimientoRoutes);
 app.use('/api/salas_productos', salaProductoRoutes);
 app.use('/api/roles', rolRouter)
+app.use('/api/scanner', codigoRoutes);
 
 app.listen(port, () => {
     console.log(`Servidor corriendo en ${port}`);

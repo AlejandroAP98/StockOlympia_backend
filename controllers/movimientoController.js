@@ -23,6 +23,60 @@ const movimientoController = {
     }
   },
 
+  registerEntryByBarcode: async (req, res) => {
+    try {
+      const { codigo, cantidad, id_sala } = req.body;
+      if (!codigo || !cantidad || cantidad <= 0) {
+        return res.status(400).json({ message: 'Código de barras y cantidad válida son obligatorios' });
+      }
+      // Obtener el producto por código
+      const result = await pool.query('SELECT id FROM productos WHERE codigo = $1', [codigo]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'Producto no encontrado' });
+      }
+      const id_producto = result.rows[0].id;
+      // Crear el movimiento
+      const movimiento = {
+        id_producto,
+        id_sala,
+        cantidad,
+        tipo_movimiento: "entrada"
+      };
+      await MovimientoModel.create(movimiento);
+      res.json({ message: 'Entrada registrada con éxito' });
+    } catch (error) {
+      console.error('Error al registrar entrada:', error);
+      res.status(500).json({ message: 'Error en el servidor' });
+    }
+  },
+
+  registerExitByBarcode: async (req, res) => {
+    try {
+      const { codigo, cantidad, id_sala } = req.body;
+      if (!codigo || !cantidad || cantidad <= 0) {
+        return res.status(400).json({ message: 'Código de barras y cantidad válida son obligatorios' });
+      }  
+      // Obtener el producto por código
+      const result = await pool.query('SELECT id FROM productos WHERE codigo = $1', [codigo]);
+      if (result.rows.length === 0) {
+        return res.status(404).json({ message: 'Producto no encontrado' });
+      }
+      const id_producto = result.rows[0].id;
+      // Crear el movimiento
+      const movimiento = {
+        id_producto,
+        id_sala,
+        cantidad,
+        tipo_movimiento: "salida"
+      };
+      await MovimientoModel.create(movimiento);
+      res.json({ message: 'Salida registrada con éxito' });
+    } catch (error) {
+      console.error('Error al registrar salida:', error);
+      res.status(500).json({ message: 'Error en el servidor' });
+    }
+  },
+
   getMovimientoById: async (req, res) => {
     try {
       const movimiento = await MovimientoModel.getById(req.params.id);

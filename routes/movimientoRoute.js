@@ -8,6 +8,8 @@ router.post('/', movimientoController.createMovimiento);
 router.get('/:id', movimientoController.getMovimientoById);
 router.put('/:id', movimientoController.updateMovimiento);
 router.delete('/:id', movimientoController.deleteMovimiento);
+router.post('/entrada-barcode', movimientoController.registerEntryByBarcode);
+router.post('/salida-barcode', movimientoController.registerExitByBarcode);
 //reportes 
 router.get('/reporte/movimiento-producto', movimientoController.getMovedProducts);
 router.get('/reporte/productos-sin-salidas', movimientoController.getWithOutOutputProducts);
