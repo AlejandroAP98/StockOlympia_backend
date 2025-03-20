@@ -36,6 +36,17 @@ const salaProductoController = {
     }
   },
 
+  getProductosSalaByCodigoAndSala: async (req, res) => {
+    const { id_sala, codigo } = req.params;
+    try {
+      const productos = await SalaProductoModel.findAllByCodigoAndSala(codigo, id_sala);
+      res.status(200).json(productos);  
+    } catch (error) {
+      console.error('Error al obtener los productos:', error);
+      res.status(500).json({ error: 'Error al obtener los productos' });
+    }
+  },
+
   createSalaProducto: async (req, res) => {
     try {
       const newSalaProducto = await SalaProductoModel.create(req.body);

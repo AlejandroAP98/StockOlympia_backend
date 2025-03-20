@@ -12,6 +12,16 @@ const SalaProductoModel = {
     return result.rows;
   },
 
+  findAllByCodigoAndSala: async (codigo, id_sala) => {
+    const result = await pool.query(`
+      SELECT sp.*, p.nombre as nombre_producto
+      FROM salas_productos sp
+      JOIN productos p ON sp.id_producto = p.id
+      WHERE p.codigo = $1 AND sp.id_sala = $2
+    `, [codigo, id_sala]);
+    return result.rows; 
+  },
+
   create: async (salaProducto) => {
     const { id_sala, id_producto, cantidad } = salaProducto;
     const result = await pool.query(

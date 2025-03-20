@@ -1,6 +1,7 @@
 // src/controllers/movimientoController.js
 const MovimientoModel = require('../models/movimientoModel');
 const { get } = require('../routes/userRoutes');
+const { pool } = require('../db');
 
 const movimientoController = {
   getAllMovimientos: async (req, res) => {
@@ -54,6 +55,7 @@ const movimientoController = {
   registerExitByBarcode: async (req, res) => {
     try {
       const { codigo, cantidad, id_sala } = req.body;
+      
       if (!codigo || !cantidad || cantidad <= 0) {
         return res.status(400).json({ message: 'Código de barras y cantidad válida son obligatorios' });
       }  
