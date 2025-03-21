@@ -28,6 +28,7 @@ const movimientoController = {
   registerEntryByBarcode: async (req, res) => {
     try {
       const { codigo, cantidad, id_sala } = req.body;
+      const id_usuario = req.user.user_id;
       if (!codigo || !cantidad || cantidad <= 0) {
         return res.status(400).json({ message: 'Código de barras y cantidad válida son obligatorios' });
       }
@@ -44,7 +45,7 @@ const movimientoController = {
         cantidad,
         tipo_movimiento: "entrada"
       };
-      await MovimientoModel.create(movimiento);
+      await MovimientoModel.create(movimiento, id_usuario);
       res.json({ message: 'Entrada registrada con éxito' });
     } catch (error) {
       console.error('Error al registrar entrada:', error);
@@ -55,7 +56,7 @@ const movimientoController = {
   registerExitByBarcode: async (req, res) => {
     try {
       const { codigo, cantidad, id_sala } = req.body;
-      
+      const id_usuario = req.user.user_id;
       if (!codigo || !cantidad || cantidad <= 0) {
         return res.status(400).json({ message: 'Código de barras y cantidad válida son obligatorios' });
       }  
@@ -72,7 +73,7 @@ const movimientoController = {
         cantidad,
         tipo_movimiento: "salida"
       };
-      await MovimientoModel.create(movimiento);
+      await MovimientoModel.create(movimiento, id_usuario);
       res.json({ message: 'Salida registrada con éxito' });
     } catch (error) {
       console.error('Error al registrar salida:', error);
