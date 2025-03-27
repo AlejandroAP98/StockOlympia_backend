@@ -21,4 +21,7 @@ router.get('/:id_sala/search', salaProductoController.searchSalaProductos);
 //Obtener el valor total de entradas por mes
 router.get('/:id_sala/valor-x-mes', salaProductoController.getValorTotalEntradasPorMes);
 
+//Obtener productos de una sala por codigo
+router.get('/:id_sala/:codigo', salaProductoController.getProductosSalaByCodigoAndSala);
+
 module.exports = router;

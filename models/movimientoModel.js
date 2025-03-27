@@ -11,9 +11,11 @@ const MovimientoModel = {
         movimientos.cantidad,
         movimientos.tipo_movimiento,
         movimientos.fecha_movimiento AT TIME ZONE 'America/Bogota' AS fecha_movimiento,
-        productos.nombre AS nombre_producto
+        productos.nombre AS nombre_producto,
+        usuarios.nombre AS nombre_usuario
       FROM movimientos
       JOIN productos ON movimientos.id_producto = productos.id
+      JOIN usuarios ON movimientos.id_usuario = usuarios.id
       ORDER BY movimientos.fecha_movimiento DESC
       LIMIT 1001
     `);
@@ -27,17 +29,16 @@ const MovimientoModel = {
   return result.rows;
   },
 
-  create: async (movimiento) => {
+  create: async (movimiento, id_usuario) => {
     const { id_producto, id_sala, cantidad, tipo_movimiento } = movimiento;
     const client = await pool.connect();
 
     try {
       await client.query("BEGIN");
-
       // Insertar el movimiento en la tabla `movimientos`
       const result = await client.query(
-        'INSERT INTO movimientos (id_producto, id_sala, cantidad, tipo_movimiento) VALUES ($1, $2, $3, $4) RETURNING *',
-        [id_producto, id_sala, cantidad, tipo_movimiento]
+        'INSERT INTO movimientos (id_producto, id_sala, cantidad, tipo_movimiento, id_usuario) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+        [id_producto, id_sala, cantidad, tipo_movimiento, id_usuario]
       );
 
       // Verificar si el producto ya existe en `salas_productos`
@@ -252,7 +253,7 @@ const MovimientoModel = {
     
   },
   
-  getHistoryProduct: async (startDate, endDate, id_sala, id_producto, id_categoria, id_marca) => {
+  getHistoryProduct: async (startDate, endDate, id_sala, id_producto, id_categoria, id_marca, id_usuario) => {
     const params = [];
     let query = `
       SELECT
@@ -262,12 +263,14 @@ const MovimientoModel = {
         movimientos.tipo_movimiento,
         movimientos.cantidad,
         movimientos.fecha_movimiento,
-        salas.nombre AS nombre_sala
+        salas.nombre AS nombre_sala,
+        usuarios.nombre AS nombre_usuario
       FROM movimientos
       JOIN productos ON movimientos.id_producto = productos.id
       JOIN salas ON movimientos.id_sala = salas.id
       JOIN categorias ON productos.id_categoria = categorias.id
       JOIN marcas ON productos.id_marca = marcas.id
+      JOIN usuarios ON movimientos.id_usuario = usuarios.id
       WHERE 1=1
     `;
   
@@ -333,7 +336,7 @@ const MovimientoModel = {
     return result.rows;
   },
 
-  getCostInputs: async (startDate, endDate, id_sala, id_producto, id_categoria, id_marca) => {
+  getCostInputs: async (startDate, endDate, id_sala, id_producto, id_categoria, id_marca, id_usuario) => {
     const params = [];
     let query = `
       SELECT
@@ -345,12 +348,14 @@ const MovimientoModel = {
         productos.precio,
         (movimientos.cantidad * productos.precio) AS valor_total,
         movimientos.fecha_movimiento,
-        salas.nombre AS nombre_sala
+        salas.nombre AS nombre_sala,
+        usuarios.nombre AS nombre_usuario
       FROM movimientos
       JOIN productos ON movimientos.id_producto = productos.id
       JOIN salas ON movimientos.id_sala = salas.id
       JOIN categorias ON productos.id_categoria = categorias.id
       JOIN marcas ON productos.id_marca = marcas.id
+      JOIN usuarios ON movimientos.id_usuario = usuarios.id
       WHERE movimientos.tipo_movimiento = 'entrada' 
     `;
   

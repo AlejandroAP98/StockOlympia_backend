@@ -12,6 +12,7 @@ const salaProductoController = {
           p.id, 
           p.nombre, 
           p.precio,
+          p.codigo,
           p.id_categoria,
           p.id_marca, 
           ps.cantidad, 
@@ -26,10 +27,20 @@ const salaProductoController = {
           ps.id_sala = $1
         ORDER BY p.nombre ASC
       `;
-
       // Ejecutar la consulta
       const { rows } = await pool.query(query, [id_sala]);
       res.status(200).json(rows);
+    } catch (error) {
+      console.error('Error al obtener los productos:', error);
+      res.status(500).json({ error: 'Error al obtener los productos' });
+    }
+  },
+
+  getProductosSalaByCodigoAndSala: async (req, res) => {
+    const { id_sala, codigo } = req.params;
+    try {
+      const productos = await SalaProductoModel.findAllByCodigoAndSala(codigo, id_sala);
+      res.status(200).json(productos);  
     } catch (error) {
       console.error('Error al obtener los productos:', error);
       res.status(500).json({ error: 'Error al obtener los productos' });
@@ -84,22 +95,22 @@ const salaProductoController = {
           p.id, 
           p.nombre, 
           p.precio,
+          p.codigo,
           p.id_categoria,
-          p.id_marca, 
-          ps.cantidad, 
+          p.id_marca,
+          ps.cantidad,
           ps.id_sala
         FROM 
           salas_productos ps
         JOIN 
-          productos p 
+          productos p
         ON 
           ps.id_producto = p.id
         WHERE 
           ps.id_sala = $1
-          AND p.nombre ILIKE $2
-
+          AND (p.nombre ILIKE $2 OR p.codigo ILIKE $3)
       `;
-      const values = [id_sala, `%${term}%`];
+      const values = [id_sala, `%${term}%`, `%${term}%`];
       const { rows } = await pool.query(query, values);
       res.json(rows);
     } catch (error) {
