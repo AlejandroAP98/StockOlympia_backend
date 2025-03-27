@@ -1,3 +1,11 @@
+// 
+// Autor: Alejandro Álvarez Patiño
+// https://github.com/AlejandroAP98
+// Fecha: 2025-27-03
+// Descripción: Archivo principal de la aplicación de inventario de productos.
+// Proyecto: StockOlympia
+
+
 const express = require('express');
 const { checkConnection } = require('./db'); 
 const userRoutes = require('./routes/userRoutes');
@@ -40,6 +48,6 @@ app.use('/api/roles', rolRouter)
 app.use('/api/scanner', codigoRoutes);
 app.use('/api/test', test);
 
-app.listen(port, () => {
+app.listen(port, 'localhost', () => {
     console.log(`Servidor corriendo en ${port}`);
 });
