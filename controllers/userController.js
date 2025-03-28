@@ -74,11 +74,11 @@ const userController = {
       const user = await UserModel.findByUsername(usuario) || await UserModel.findByEmail(usuario);
       if (user && (await bcrypt.compare(contrasena, user.contrasena))) {
         const token = jwt.sign(
-          { usuario: user.usuario, rol: user.id_rol, sala: user.id_sala, user_id: user.id },
+          { usuario: user.usuario, rol: user.id_rol, sala: user.id_sala, user_id: user.id, username: user.nombre },
           process.env.JWT_SECRET,
-          { expiresIn: '1h' }
+          { expiresIn: '8h' } 
         );  
-        return res.json({ token, sala: user.id_sala, rol: user.id_rol, user_id: user.id });
+        return res.json({ token, sala: user.id_sala, rol: user.id_rol, user_id: user.id, username: user.nombre });
       }
       res.status(401).send('Credenciales incorrectas');
     } catch (error) {
