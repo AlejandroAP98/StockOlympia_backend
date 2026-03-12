@@ -95,7 +95,7 @@ const productoController = {
         WHERE 
           p.nombre ILIKE $1 OR p.codigo ILIKE $2
         GROUP BY 
-          p.id, sp.cantidad
+          p.id
       `;
 
       const values = [`%${term}%`, `%${term}%`];

@@ -1,10 +1,11 @@
 // src/models/userModel.js
-const { pool } = require('../db'); // Asegúrate de importar tu conexión a la base de datos
-const bcrypt = require('bcryptjs'); // Para hashear contraseñas
+const { pool } = require('../db'); 
+const bcrypt = require('bcryptjs'); 
 
 const UserModel = {
+  // 1. Modificado: Solo trae usuarios activos
   findAll: async () => {
-    const result = await pool.query('SELECT id, nombre, email, usuario, id_rol, fecha_creacion, id_sala FROM usuarios');
+    const result = await pool.query('SELECT id, nombre, email, usuario, id_rol, fecha_creacion, id_sala FROM usuarios WHERE activo = true');
     return result.rows;
   },
 
@@ -22,7 +23,6 @@ const UserModel = {
     if (id_rol) { columns.push("id_rol"); values.push(id_rol); }
     if (id_sala) { columns.push("id_sala"); values.push(id_sala); }
 
-
     const placeholders = values.map((_, index) => `$${index + 1}`).join(', ');
 
     const query = `
@@ -35,8 +35,9 @@ const UserModel = {
     return result.rows[0];
   },
 
+  // Busca por ID sin importar si está activo (útil para el historial de movimientos)
   findById: async (id) => {
-    const result = await pool.query('SELECT id, nombre, email, contrasena, id_rol, fecha_creacion, usuario, id_sala FROM usuarios WHERE id = $1', [id]);
+    const result = await pool.query('SELECT id, nombre, email, contrasena, id_rol, fecha_creacion, usuario, id_sala, activo FROM usuarios WHERE id = $1', [id]);
     return result.rows[0];
   },
 
@@ -62,20 +63,23 @@ const UserModel = {
     return result.rows[0];
   },
 
+  // 2. Modificado: Borrado lógico (Soft Delete)
   delete: async (id) => {
-    const result = await pool.query('DELETE FROM usuarios WHERE id = $1 RETURNING *', [id]);
+    const result = await pool.query('UPDATE usuarios SET activo = false WHERE id = $1 RETURNING *', [id]);
     return result.rows[0];
   },
 
+  // 3. Modificado: Solo permite login a usuarios activos
   findByUsername: async (username) => {
-    const result = await pool.query('SELECT * FROM usuarios WHERE usuario = $1', [username]);
+    const result = await pool.query('SELECT * FROM usuarios WHERE usuario = $1 AND activo = true', [username]);
     return result.rows[0];
   },
 
+  // 4. Modificado: Solo permite login a usuarios activos
   findByEmail: async (email) => {
-    const result = await pool.query('SELECT * FROM usuarios WHERE email = $1', [email]);
+    const result = await pool.query('SELECT * FROM usuarios WHERE email = $1 AND activo = true', [email]);
     return result.rows[0];
-  },
+  }
 };
 
 module.exports = UserModel;

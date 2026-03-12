@@ -78,7 +78,7 @@ const userController = {
           process.env.JWT_SECRET,
           { expiresIn: '1h' }
         );  
-        return res.json({ token, sala: user.id_sala, rol: user.id_rol, user_id: user.id });
+        return res.json({ token, sala: user.id_sala, rol: user.id_rol, user_id: user.id, username: user.usuario });
       }
       res.status(401).send('Credenciales incorrectas');
     } catch (error) {
